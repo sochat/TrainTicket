@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>火车票</title>
+    <style>
+        .marker
+        {
+            position: absolute;
+        }
+        #captcha-wrapper
+        {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div>
+            <label>用户名</label>
+            <input type="text" id="username" name="username" />
+        </div>
+        <div>
+            <label for="">密码</label>
+            <input type="password" id="password" name="password">
+        </div>
+        <div id="captcha-wrapper">
+            <img src="https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.5665384579497543" 
+            id="captcha" />
+        </div>
+        <div>
+            <button id="login">登录</button>
+        </div>
+    </div>
+</body>
+
+<script>
+    require('./renderer.js');
+</script>
+</html>
