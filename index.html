@@ -1,40 +1,137 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <title>火车票</title>
     <style>
-        .marker
+        html
         {
+            height: 100%;
+        }
+        body 
+        {
+            font-family: "PingFang SC";            
+            margin: 0;
+            padding: 0;
+            height: 100%;            
+        }
+        #app
+        {
+            display: flex;
+            height: 100%;
+        }
+        .marker {
             position: absolute;
         }
-        #captcha-wrapper
-        {
+
+        #captcha-wrapper {
             position: relative;
+            text-align: center;
+        }
+
+        .nav {
+            width: 150px;
+            height: 100%;
+            padding: 15px;
+            background-color: #eef1f8;
+        }
+
+        .nav li
+        {
+            list-style-type: none;
+            display: block;
+            padding: 0.5em;
+            /*text-align: right;*/
+        }
+
+        .nav-button
+        {
+            text-decoration: none;
+        }
+
+        #login-form
+        {
+            padding: 20px;
+        }
+
+        #login-form label
+        {
+            width: 60px;
+            display: inline-block;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        #login-form .form-row
+        {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+        #login-form button
+        {
+            padding: 0.4em 1em;
+            font-size: 1em;
+            border: none;
+            border-radius: 4px;
+            background-color: #3883fa;
+            color: #fff;
         }
     </style>
 </head>
+
 <body>
-    <div>
-        <div>
+    <div id="app">
+    <nav class="nav">
+        <header>
+            <h1>火车票</h1>
+        </header>
+        <ul>
+            <li><a href="#" v-on:click="showLogin">登录</a></li>            
+            <li><router-link class="nav-button" to="/cal">订票日历</router-link></li>
+            <li><router-link class="nav-button" to="/query">车票查询</router-link></li>
+        </ul>
+    </nav>
+    <main>
+        <router-view></router-view>
+    </main>
+    <modal name="loginForm" height="350" width="400">
+        <div id="login-form">
+        <div class="form-row">
             <label>用户名</label>
             <input type="text" id="username" name="username" />
         </div>
-        <div>
+        <div class="form-row">
             <label for="">密码</label>
             <input type="password" id="password" name="password">
         </div>
         <div id="captcha-wrapper">
-            <img src="https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.5665384579497543" 
-            id="captcha" />
+            <img src="https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.5665384579497543"
+                id="captcha" />
         </div>
-        <div>
+        <div class="form-row">
             <button id="login">登录</button>
         </div>
+        </div>
+    </modal>
     </div>
 </body>
-
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 <script>
+    //const Vue = require('vue');
     require('./renderer.js');
+    const VModal = require('vue-js-modal');
+    Vue.use(VModal.default);
+    var app = new Vue({
+        el: '#app',             
+        methods: {
+            showLogin: function () {
+                this.$modal.show('loginForm');
+            }
+        }
+    });
 </script>
+
 </html>

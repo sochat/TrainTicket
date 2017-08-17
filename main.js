@@ -11,13 +11,16 @@ let mainWindow;
 
 app.commandLine.appendSwitch('ignore-certificate-errors');
 app.on("ready", function () {
-    mainWindow = new BrowserWindow({width: 800, height: 600, webPreferences: {allowRunningInsecureContent: true}});
+    mainWindow = new BrowserWindow({width: 800, height: 600, 
+        title: '火车票',
+        webPreferences: {allowRunningInsecureContent: true}
+    });
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));
-
+    mainWindow.webContents.openDevTools();
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
