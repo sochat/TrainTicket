@@ -49,7 +49,29 @@ let api = {
                 error: function (statusCode, statusMessage) { 
                     reject(statusCode, statusMessage);
                 }
-            })
+            });
+        });
+    },
+    captcha: function (answer) {
+        return new Promise((resolve, reject) => {
+            util.ajax({
+                type: "POST",
+                url: 'https://kyfw.12306.cn/passport/captcha/captcha-check',
+                data: {
+                    answer: answer, login_site: 'E', rand: 'sjrand'
+                },
+                datatype: "json",
+                success: function (i) {
+                    if (i.result_code == "4") {                        
+                        resolve();
+                    } else {                        
+                        reject(i.result_code, i.result_message);                        
+                    }                    
+                },
+                error: function (statusCode, statusMessage) { 
+                    reject(statusCode, statusMessage);
+                }
+            });
         });
     }
 };

@@ -11,7 +11,7 @@
         }
         body 
         {
-            font-family: "PingFang SC";            
+            font-family: "Microsoft Yahei", "PingFang SC";            
             margin: 0;
             padding: 0;
             height: 100%;            
@@ -108,30 +108,21 @@
         </div>
         <div id="captcha-wrapper">
             <img src="https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.5665384579497543"
-                id="captcha" />
+                id="captcha" v-on:mouseup="captcha" />
         </div>
         <div class="form-row">
-            <button id="login">登录</button>
+            <button id="login" v-on:click="login">登录</button>
         </div>
         </div>
     </modal>
     </div>
 </body>
 <script src="https://unpkg.com/vue"></script>
-<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<!-- <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> -->
 <script>
     //const Vue = require('vue');
     require('./renderer.js');
-    const VModal = require('vue-js-modal');
-    Vue.use(VModal.default);
-    var app = new Vue({
-        el: '#app',             
-        methods: {
-            showLogin: function () {
-                this.$modal.show('loginForm');
-            }
-        }
-    });
+    
 </script>
 
 </html>

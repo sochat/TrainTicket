@@ -4,7 +4,7 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron --debug-brk=5858 ."
+    "start": "electron ."
   },
   "repository": "https://github.com/sochat/TrainTicket",
   "keywords": [

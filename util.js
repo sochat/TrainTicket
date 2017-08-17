@@ -12,7 +12,7 @@ module.exports = {
         let req = net.request({
             url: params.url,
             method: params.type || "GET"
-        }).on('response', (res) => {
+        }).on('response', (response) => {
             let data = '';
             response.on('data', (chunk) => {
                 data += chunk;

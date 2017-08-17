@@ -6,6 +6,7 @@ const url = require('url');
 const querystring = require('querystring');
 const ipc = electron.ipcMain;
 const net = electron.net;
+const api = require('./api');
 
 let mainWindow;
 
@@ -20,10 +21,22 @@ app.on("ready", function () {
         protocol: 'file:',
         slashes: true
     }));
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
+    net.request('https://kyfw.12306.cn/otn/login/init')
+    .on('response', (res) => {
+        console.log(res.headers);
+        res.headers['set-cookie'].forEach(function(element) {
+            let arr = element.split(/[=;]/);
+            mainWindow.webContents.session.cookies.set({
+                url: 'https://kyfw.12306.cn' + arr[3], name: arr[0], value: arr[1]
+            }, (error) => {
+                if (error) console.error(error)
+            });
+        }, this);        
+    }).end();
 });
 
 app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
@@ -44,23 +57,12 @@ app.on('window-all-closed', function () {
   //}
 });
 
-ipc.on('captcha', function (event, param) {
-    const req = net.request({
-        method: 'POST',
-        url: 'https://kyfw.12306.cn/passport/captcha/captcha-check'
-    });
-    let qs = querystring.stringify({answer: param, login_site: 'E', rand: 'sjrand'});    
-    req.on('response', (res) => {
-        if (res.statusCode == 200) {
-            event.sender.send('captcha', true);
-        } else {
-            event.sender.send('captcha', false, res.statusMessage);
-        }
-    });
-    req.on('error', (error) => {
-        let e = error;
-    })
-    req.end(qs);
+ipc.on('captcha', function (event, param) {    
+    api.captcha(param).then(() => {
+        event.sender.send('captcha', true);
+    }, (code, message) => {
+        event.sender.send('captcha', false, message);
+    });    
 });
 
 ipc.on('login', (event, user, pass) => {
