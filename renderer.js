@@ -8,10 +8,30 @@ const Vue = require('./node_modules/vue/dist/vue.common.js');
 const VModal = require('vue-js-modal');
 Vue.use(VModal.default);
 let app = new Vue({
-    el: '#app',             
+    el: '#app',    
+    data: {
+        captchaSrc: '',
+        enabled: false
+    },         
     methods: {
         showLogin: function () {
             this.$modal.show('loginForm');
+            ipc.send('init');
+            var self = this;
+            ipc.on('init', function (event, params) {
+                /*params.forEach(function(element) {
+                    document.cookie = element;                    
+                });
+                self.captchaSrc = 'https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&'
+                    + Math.random();
+                */
+                ipc.send('loadCaptcha');
+            });
+            ipc.on('loadCaptcha', function (event, url) {                
+                self.captchaSrc = url;
+                self.enabled = true;
+                answer = [];
+            });
         },
         login: function () {
             ipc.send('captcha', answer.join(','));

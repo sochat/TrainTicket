@@ -107,11 +107,11 @@
             <input type="password" id="password" name="password">
         </div>
         <div id="captcha-wrapper">
-            <img src="https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.5665384579497543"
+            <img v-bind:src="captchaSrc"
                 id="captcha" v-on:mouseup="captcha" />
         </div>
         <div class="form-row">
-            <button id="login" v-on:click="login">登录</button>
+            <button id="login" v-bind:disabled="!enabled" v-on:click="login">登录</button>
         </div>
         </div>
     </modal>

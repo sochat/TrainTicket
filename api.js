@@ -1,4 +1,4 @@
-const { session, net } = require('electron');
+const { session, net, nativeImage } = require('electron');
 const util = require('./util');
 const passport_authuam = 'https://kyfw.12306.cn/passport/web/auth/uamtk';
 const passport_appId = 'otn';
@@ -73,6 +73,24 @@ let api = {
                 }
             });
         });
+    },
+    loadCaptcha: function () {        
+        return new Promise((resolve, reject) => {
+            var buf = null;
+            net.request('https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&'
+                + Math.random()).on('response', (res) => {
+                res.on('data', (chunk) => {
+                    if (!buf) {
+                        buf = Buffer.from(chunk);
+                    } else {
+                        buf = Buffer.concat([buf, chunk], buf.length + chunk.length);
+                    }
+                }).on('end', () => {
+                    let img = nativeImage.createFromBuffer(buf);
+                    resolve(img.toDataURL());
+                });
+            }).end();
+        });      
     }
 };
 module.exports = api;

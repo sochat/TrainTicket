@@ -25,18 +25,7 @@ app.on("ready", function () {
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
-    net.request('https://kyfw.12306.cn/otn/login/init')
-    .on('response', (res) => {
-        console.log(res.headers);
-        res.headers['set-cookie'].forEach(function(element) {
-            let arr = element.split(/[=;]/);
-            mainWindow.webContents.session.cookies.set({
-                url: 'https://kyfw.12306.cn' + arr[3], name: arr[0], value: arr[1]
-            }, (error) => {
-                if (error) console.error(error)
-            });
-        }, this);        
-    }).end();
+    
 });
 
 app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
@@ -56,6 +45,28 @@ app.on('window-all-closed', function () {
     app.quit();
   //}
 });
+
+ipc.on('init', function (event) {
+    net.request('https://kyfw.12306.cn/otn/login/init')
+        .on('response', (res) => {
+            console.log(res.headers);
+            /*res.headers['set-cookie'].forEach(function (element) {
+                let arr = element.split(/[=;]/);                
+                mainWindow.webContents.session.cookies.set({
+                    url: 'https://kyfw.12306.cn' + arr[3], name: arr[0], value: arr[1]
+                }, (error) => {
+                    if (error) console.error(error)
+                });
+            }, this);*/
+            event.sender.send('init', res.headers['set-cookie']);
+        }).end();
+});
+
+ipc.on('loadCaptcha', (e) => {
+    api.loadCaptcha().then((url) => {
+        e.sender.send('loadCaptcha', url);
+    });
+})
 
 ipc.on('captcha', function (event, param) {    
     api.captcha(param).then(() => {

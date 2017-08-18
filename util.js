@@ -1,8 +1,14 @@
-const {net } = require('electron');
+const { net, session } = require('electron');
 const querystring = require('querystring');
+const tough = require('tough-cookie');
 
 module.exports = {
     ajax: function (params, success, fail) {
+        var cookiejar = new tough.CookieJar();
+        session.defaultSession.cookies.get({}, (error, cookies) => {
+            console.log(error, cookies);            
+            //cookiejar.getCookieStringSync            
+        });  
         if (typeof params.success === 'function') {
             success = params.success;
         }
@@ -35,10 +41,15 @@ module.exports = {
                 }
             });
         });
+        req.setHeader('Host', 'kyfw.12306.cn');
+        req.setHeader('Referer', 'https://kyfw.12306.cn/otn/login/init');
+        
+        console.log(req.getHeader('Cookie'));
         if (typeof params.data === 'undefined' || params.data === null) {
             req.end();
         } else {
-            req.end(typeof data === "string" ? data : querystring.stringify(data) );
+            let content = typeof params.data === "string" ? params.data : querystring.stringify(params.data); 
+            req.end(content);
         }
     }
 };
