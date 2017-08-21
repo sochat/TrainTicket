@@ -11,7 +11,7 @@ module.exports = {
         if (typeof params.error === 'function') {
             fail = params.error;
         }
-        this.getCookie().then((cookieString) => {
+        this.getCookie(params.url).then((cookieString) => {
             let req = net.request({
                 url: params.url,
                 method: params.type || "GET"
@@ -37,9 +37,15 @@ module.exports = {
                         fail(res.statusMessage);
                     }
                 });
+            }).on('finish', function () {
+                var c = req.getHeader('Cookie');
             });
+            if (params.type === 'POST') {
+                req.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            }
             req.setHeader('Host', 'kyfw.12306.cn');
             req.setHeader('Referer', 'https://kyfw.12306.cn/otn/login/init');
+            req.setHeader('Origin', 'https://kyfw.12306.cn');
             req.setHeader('Cookie', cookieString);
             if (typeof params.data === 'undefined' || params.data === null) {
                 req.end();
@@ -49,19 +55,20 @@ module.exports = {
             }
         });
     },
-    getCookie: function () {
+    getCookie: function (url) {
         return new Promise((resolve, reject) => {
             var cookiejar = new tough.CookieJar();
             session.defaultSession.cookies.get({}, (error, cookies) => {
                 console.log(error, cookies);
                 cookies.forEach(function (cookie) {
-                    cookiejar.setCookie(Cookie({
+                    cookiejar.setCookie(new Cookie({
                         key: cookie.name,
                         value: cookie.value,
-    
-                    }));
+                        domain: cookie.domain,
+                        path: cookie.path    
+                    }), 'https://kyfw.12306.cn' + cookie.path , () => {});
                 });
-                var cookieString = cookiejar.getCookieStringSync();
+                var cookieString = cookiejar.getCookieStringSync(url);
                 resolve(cookieString);
             });        
         });

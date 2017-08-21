@@ -6,6 +6,7 @@ const url = require('url');
 const querystring = require('querystring');
 const ipc = electron.ipcMain;
 const net = electron.net;
+const session = electron.session;
 const api = require('./api');
 
 let mainWindow;
@@ -59,6 +60,13 @@ ipc.on('init', function (event) {
                     if (error) console.error(error)
                 });
             }, this);*/
+            session.defaultSession.cookies.set({
+                name: 'fp_ver',
+                value: '4.5.1',
+                path: '/',
+                //domain: 'kyfw.12306.cn',
+                url: 'https://kyfw.12306.cn/'
+            }, () => {});
             event.sender.send('init', res.headers['set-cookie']);
         }).end();
 });
@@ -78,27 +86,9 @@ ipc.on('captcha', function (event, param) {
 });
 
 ipc.on('login', (event, user, pass) => {
-    const req = net.request({
-        url: 'https://kyfw.12306.cn/passport/web/login',
-        method: 'POST'
-    });
-    req.on('response', (res) => {
-        if (res.statusCode == 200) {
-            api.checkUAM().then(() => {
-                event.sender.send('login', true);
-            }, (statusMessage) => {
-                event.sender.send('login', false, statusMessage);                
-            });
-        } else {
-            event.sender.send('login', false, res.statusMessage);
-        }
-    });
-    req.on('error', (error) => {
-        console.log(error);
-    })
-    req.end(querystring.stringify({
-        username: user,
-        password: pass,
-        appid: 'otn'
-    }));
+    api.login(user, pass).then(() => {
+        event.sender.send('login', true);
+    }, (statusMessage) => {
+        event.sender.send('login', false, statusMessage);
+    });    
 })

@@ -79,6 +79,23 @@
             color: #fff;
         }
     </style>
+    <link rel="stylesheet" type="text/css" href="cal/dhtmlxscheduler.css">
+    <script src="cal/dhtmlxscheduler.js"></script>
+    <script type="text/x-template" id="cal">
+        <div id="scheduler_here" class="dhx_cal_container" style='width:800px; height:600px;'>
+    <div class="dhx_cal_navline">
+        <div class="dhx_cal_prev_button">&nbsp;</div>
+        <div class="dhx_cal_next_button">&nbsp;</div>
+        <div class="dhx_cal_today_button"></div>
+        <div class="dhx_cal_date"></div>
+        <div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+        <div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+        <div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+    </div>
+    <div class="dhx_cal_header"></div>
+    <div class="dhx_cal_data"></div>
+</div>
+    </script>
 </head>
 
 <body>
@@ -90,7 +107,7 @@
         <ul>
             <li><a href="#" v-on:click="showLogin">登录</a></li>            
             <li><router-link class="nav-button" to="/cal">订票日历</router-link></li>
-            <li><router-link class="nav-button" to="/query">车票查询</router-link></li>
+            <!-- <li><router-link class="nav-button" to="/query">车票查询</router-link></li> -->
         </ul>
     </nav>
     <main>
@@ -100,25 +117,27 @@
         <div id="login-form">
         <div class="form-row">
             <label>用户名</label>
-            <input type="text" id="username" v:bind="username" />
+            <input type="text" id="username" v-model="username" />
         </div>
         <div class="form-row">
             <label for="">密码</label>
-            <input type="password" id="password" name="password">
+            <input type="password" id="password" v-model="password">
         </div>
         <div id="captcha-wrapper">
             <img v-bind:src="captchaSrc"
                 id="captcha" v-on:mouseup="captcha" />
         </div>
         <div class="form-row">
+            <button id="reload" v-on:click="reload">刷新</button>
             <button id="login" v-bind:disabled="!enabled" v-on:click="login">登录</button>
         </div>
         </div>
     </modal>
     </div>
 </body>
-<!--<script src="https://unpkg.com/vue"></script>
- <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> -->
+<script src="https://unpkg.com/vue"></script>
+ <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
+    <script src="cal/calendar.js"></script> 
 <script>
     //const Vue = require('vue');
     require('./renderer.js');

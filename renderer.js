@@ -4,14 +4,28 @@ const login = document.getElementById('login');
 const captcha = document.getElementById('captcha');
 const cw = document.getElementById('captcha-wrapper');
 let answer = [];
-const Vue = require('./node_modules/vue/dist/vue.common.js');
+//const Vue = require('./node_modules/vue/dist/vue.common.js');
 const VModal = require('vue-js-modal');
 Vue.use(VModal.default);
+
+
+const routes = [
+    { path: '/cal', component: calendar }
+   // { path: '/bar', component: Bar }
+];
+
+const router = new VueRouter({
+    routes 
+});
+
 let app = new Vue({
+    router,
     el: '#app',    
     data: {
         captchaSrc: '',
-        enabled: false
+        enabled: false,
+        username: 'sochat',
+        password: 'Symbian_3'
     },         
     methods: {
         showLogin: function () {
@@ -32,6 +46,13 @@ let app = new Vue({
                 self.enabled = true;
                 answer = [];
             });
+            ipc.on('captcha', function (event, success, error) {
+                if (success) {                    
+                    ipc.send('login', self.username, self.password);
+                } else {
+                    alert(error);
+                }
+            });
         },
         login: function () {
             ipc.send('captcha', answer.join(','));
@@ -39,17 +60,10 @@ let app = new Vue({
         captcha: function (e) {
             answer.push(e.offsetX);
             answer.push(e.offsetY);
+        },
+        reload: function () {
+            ipc.send('loadCaptcha');
         }
-    }
-});
-
-ipc.on('captcha', function (event, success, error) {
-    if (success) {
-        let user = document.getElementById('username').value;
-        let pass = document.getElementById('password').value;
-        ipc.send('login', user, pass);
-    } else {
-        alert(error);
     }
 });
 

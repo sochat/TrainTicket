@@ -7,6 +7,7 @@ const passport_authclient = 'uamauthclient';
 
 let api = {
     checkUAM: function () {
+        var self = this;        
         return new Promise((resolve, reject) => {
             session.defaultSession.cookies.get({
                 url: 'https://kyfw.12306.cn',
@@ -22,12 +23,12 @@ let api = {
                     }, function (e) {
                         if (e.result_code == "0") {
                             let f = e.newapptk || e.apptk;
-                            this.uampassport(f)
+                            self.uampassport(f)
                             .then(resolve, reject);
                         }   
                     });                
                 } else {
-                    this.uampassport(d).then(resolve, reject);
+                    self.uampassport(d).then(resolve, reject);
                 }
             });
         });
@@ -36,7 +37,7 @@ let api = {
         return new Promise((resolve, reject) => {
             util.ajax({
                 type: "POST",
-                url: ctx + passport_authclient,
+                url: 'https://kyfw.12306.cn' + ctx + passport_authclient,
                 data: {
                     tk: d
                 },
@@ -77,20 +78,53 @@ let api = {
     loadCaptcha: function () {        
         return new Promise((resolve, reject) => {
             var buf = null;
-            net.request('https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&'
-                + Math.random()).on('response', (res) => {
-                res.on('data', (chunk) => {
-                    if (!buf) {
-                        buf = Buffer.from(chunk);
-                    } else {
-                        buf = Buffer.concat([buf, chunk], buf.length + chunk.length);
-                    }
-                }).on('end', () => {
-                    let img = nativeImage.createFromBuffer(buf);
-                    resolve(img.toDataURL());
+            util.getCookie('https://kyfw.12306.cn/passport').then(cookieString => {
+                var req = net.request('https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&'
+                    + Math.random()).on('response', (res) => {
+                    res.on('data', (chunk) => {
+                        if (!buf) {
+                            buf = Buffer.from(chunk);
+                        } else {
+                            buf = Buffer.concat([buf, chunk], buf.length + chunk.length);
+                        }
+                    }).on('end', () => {
+                        let img = nativeImage.createFromBuffer(buf);
+                        resolve(img.toDataURL());
+                    });
                 });
-            }).end();
+                req.setHeader('Cookie', cookieString);
+                req.setHeader('Host', 'kyfw.12306.cn');
+                req.setHeader('Referer', 'https://kyfw.12306.cn/otn/login/init');
+                req.end();
+            });
         });      
+    },
+    login: function (user, pass) {
+        var self = this;
+        return new Promise((resolve, reject) => {
+            util.ajax({
+                type: "POST",
+                url: 'https://kyfw.12306.cn/passport/web/login',
+                data: {
+                    username: user,
+                    password: pass,
+                    appid: 'otn'
+                },
+                datatype: "json",
+                success: function (result) {
+                    console.log(result);
+                    self.checkUAM().then(() => {
+                        resolve();
+                    }, (statusMessage) => {
+                        reject(statusMessage);
+                    });
+                },
+                error: function (error) {
+                    console.log(error);     
+                    reject(error);               
+                }
+            })
+        });
     }
 };
 module.exports = api;
