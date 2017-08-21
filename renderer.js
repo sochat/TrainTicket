@@ -53,6 +53,13 @@ let app = new Vue({
                     alert(error);
                 }
             });
+            ipc.on('login', function (event, success, error) {
+                if (success) {
+                    self.$modal.hide('loginForm');
+                } else {
+                    alert(error);
+                }
+            });
         },
         login: function () {
             ipc.send('captcha', answer.join(','));
@@ -67,10 +74,4 @@ let app = new Vue({
     }
 });
 
-ipc.on('login', function (event, success, error) {
-    if (success) {
-        alert("ok");
-    } else {
-        alert(error);
-    }
-});
+

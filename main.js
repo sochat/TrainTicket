@@ -91,4 +91,36 @@ ipc.on('login', (event, user, pass) => {
     }, (statusMessage) => {
         event.sender.send('login', false, statusMessage);
     });    
+});
+
+function formatDate(d) {
+    var curr_date = d.getDate();
+    var curr_month = d.getMonth() + 1; //Months are zero based
+    var curr_year = d.getFullYear();
+    var pad = function (num) {
+        var s = num+"";
+        while (s.length < 2) s = "0" + s;
+        return s;
+    }
+    return curr_year + "-" + pad(curr_month) + "-" + pad(curr_date);
+}
+
+ipc.on('queryOrder', (event) => {
+    var date = new Date();
+    var end = new Date(date.getTime() + 30 * 86400 * 1000);
+    api.queryOrder(formatDate(date), formatDate(end))
+    .then((result) => {
+        let list = result.data.OrderDTODataList;
+        let tickets = [];
+        list.forEach(function(element) {
+            element.tickets.forEach(ticket => {
+                tickets.push({
+                    text: ticket.stationTrainDTO.from_station_name + '--' + ticket.stationTrainDTO.to_station_name,
+                    start_date: ticket.start_train_date_page,
+                    end_date: new Date(Date.parse(ticket.train_date) + Date.parse(ticket.stationTrainDTO.arrive_time)).toLocaleString('ja-JP')
+                });
+            });            
+        });
+        event.sender.send('queryOrder', tickets);
+    })
 })

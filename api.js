@@ -125,6 +125,33 @@ let api = {
                 }
             })
         });
+    },
+    queryOrder: function (start, end) {
+        return new Promise((resolve, reject) => {
+            util.ajax({
+                type: "POST",
+                url: 'https://kyfw.12306.cn/otn/queryOrder/queryMyOrder',
+                data: {
+                    queryType: 2,
+                    queryStartDate:start,
+                    queryEndDate: end,
+                    come_from_flag: 'my_order',
+                    pageSize: 80,
+                    pageIndex: 0,
+                    query_where:'G',
+                    sequeue_train_name:''
+                },
+                datatype: "json",
+                success: function (result) {
+                    resolve(result);
+                },
+                error: function (error) {
+                    console.log(error);     
+                    reject(error);               
+                }
+            })
+        });
+        
     }
 };
 module.exports = api;
