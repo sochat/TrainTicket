@@ -12,7 +12,8 @@ let mainWindow;
 
 app.commandLine.appendSwitch('ignore-certificate-errors');
 app.on("ready", function () {
-    mainWindow = new BrowserWindow({width: 800, height: 600, 
+    mainWindow = new BrowserWindow({
+        width: 800, height: 600, 
         title: '火车票',
         webPreferences: {allowRunningInsecureContent: true}
     });
@@ -71,7 +72,7 @@ ipc.on('loadCaptcha', (e) => {
 ipc.on('captcha', function (event, param) {    
     api.captcha(param).then(() => {
         event.sender.send('captcha', true);
-    }, (code, message) => {
+    }, (message) => {
         event.sender.send('captcha', false, message);
     });    
 });
@@ -85,7 +86,7 @@ ipc.on('login', (event, user, pass) => {
         if (res.statusCode == 200) {
             api.checkUAM().then(() => {
                 event.sender.send('login', true);
-            }, (code, statusMessage) => {
+            }, (statusMessage) => {
                 event.sender.send('login', false, statusMessage);                
             });
         } else {

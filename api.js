@@ -46,8 +46,8 @@ let api = {
                         resolve();
                     }
                 },
-                error: function (statusCode, statusMessage) { 
-                    reject(statusCode, statusMessage);
+                error: function (statusMessage) { 
+                    reject(statusMessage);
                 }
             });
         });
@@ -65,11 +65,11 @@ let api = {
                     if (i.result_code == "4") {                        
                         resolve();
                     } else {                        
-                        reject(i.result_code, i.result_message);                        
+                        reject(i.result_message);                        
                     }                    
                 },
-                error: function (statusCode, statusMessage) { 
-                    reject(statusCode, statusMessage);
+                error: function (statusMessage) { 
+                    reject(statusMessage);
                 }
             });
         });
